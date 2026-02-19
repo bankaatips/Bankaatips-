@@ -1,0 +1,1864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BankaaTips - Admin Backend</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #16C784;
+            --primary-dark: #12a56d;
+            --bg-dark: #0f0f14;
+            --bg-card: #1a1a24;
+            --bg-card-hover: #252530;
+            --text-primary: #ffffff;
+            --text-secondary: #8b8b9e;
+            --border: #2a2a3a;
+            --success: #16C784;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* Login Screen */
+        .login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--bg-dark), #1a1a2e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .login-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 48px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .login-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 50%;
+            margin: 0 auto 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+        }
+
+        .login-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .login-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 16px;
+            background: var(--bg-dark);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 18px;
+            text-align: center;
+            letter-spacing: 8px;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            outline: none;
+        }
+
+        .login-input:focus {
+            border-color: var(--primary);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .login-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .login-error {
+            color: var(--danger);
+            font-size: 14px;
+            margin-top: 16px;
+            display: none;
+        }
+
+        /* Admin Layout */
+        .admin-layout {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .admin-layout.show {
+            display: flex;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-logo {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .sidebar-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .sidebar-subtitle {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .nav-section {
+            margin-bottom: 24px;
+        }
+
+        .nav-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            padding-left: 12px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 4px;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-card-hover);
+        }
+
+        .nav-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .nav-label {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 32px;
+            max-width: 1200px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .page-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 15px;
+            color: var(--text-primary);
+            outline: none;
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            border-color: var(--primary);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-row-3 {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background: var(--bg-card-hover);
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: rgba(22, 199, 132, 0.15);
+            color: var(--success);
+        }
+
+        .badge-danger {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+        }
+
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+        }
+
+        /* Lists */
+        .list-item {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .list-item-info {
+            flex: 1;
+        }
+
+        .list-item-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .list-item-sub {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .list-item-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-small {
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 16px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+        }
+
+        .tab:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+        }
+
+        .tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Export Section */
+        .export-section {
+            background: linear-gradient(135deg, rgba(22, 199, 132, 0.1), rgba(22, 199, 132, 0.05));
+            border: 2px dashed var(--primary);
+            border-radius: 16px;
+            padding: 32px;
+            text-align: center;
+        }
+
+        .export-textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 16px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            color: var(--text-primary);
+            margin: 20px 0;
+            resize: vertical;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 32px;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        /* Page Sections */
+        .page-section {
+            display: none;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        /* Result Update Form */
+        .result-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 12px;
+            align-items: end;
+        }
+
+        .result-form input, .result-form select {
+            padding: 10px 14px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 240px;
+            }
+            .main-content {
+                margin-left: 240px;
+                padding: 20px;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+                z-index: 100;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-row, .form-row-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-box">
+            <div class="login-icon">🔐</div>
+            <div class="login-title">Admin Access</div>
+            <div class="login-subtitle">BankaaTips Management Backend</div>
+            <input type="password" class="login-input" id="loginPassword" placeholder="••••••" maxlength="6">
+            <button class="login-btn" onclick="login()">Login</button>
+            <div class="login-error" id="loginError">Incorrect password. Try again.</div>
+        </div>
+    </div>
+
+    <!-- Admin Layout -->
+    <div class="admin-layout" id="adminLayout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">B</div>
+                <div>
+                    <div class="sidebar-title">BankaaTips</div>
+                    <div class="sidebar-subtitle">Admin Backend</div>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Dashboard</div>
+                <div class="nav-item active" onclick="showPage('dashboard')">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-label">Overview</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Content Management</div>
+                <div class="nav-item" onclick="showPage('tips')">
+                    <span class="nav-icon">⚽</span>
+                    <span class="nav-label">Daily Tips</span>
+                </div>
+                <div class="nav-item" onclick="showPage('results')">
+                    <span class="nav-icon">✅</span>
+                    <span class="nav-label">Update Results</span>
+                </div>
+                <div class="nav-item" onclick="showPage('history')">
+                    <span class="nav-icon">📁</span>
+                    <span class="nav-label">History Archive</span>
+                </div>
+                <div class="nav-item" onclick="showPage('news')">
+                    <span class="nav-icon">📰</span>
+                    <span class="nav-label">News</span>
+                </div>
+                <div class="nav-item" onclick="showPage('banners')">
+                    <span class="nav-icon">🖼️</span>
+                    <span class="nav-label">Banners</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Pro Services</div>
+                <div class="nav-item" onclick="showPage('pro')">
+                    <span class="nav-icon">👑</span>
+                    <span class="nav-label">Pro Results</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Settings</div>
+                <div class="nav-item" onclick="showPage('settings')">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-label">Site Settings</span>
+                </div>
+                <div class="nav-item" onclick="showPage('export')">
+                    <span class="nav-icon">📤</span>
+                    <span class="nav-label">Export to Site</span>
+                </div>
+            </div>
+
+            <div class="nav-section" style="margin-top: auto;">
+                <div class="nav-item" onclick="logout()">
+                    <span class="nav-icon">🚪</span>
+                    <span class="nav-label">Logout</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Page -->
+            <div class="page-section active" id="page-dashboard">
+                <div class="page-header">
+                    <div class="page-title">Dashboard Overview</div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="statTotalTips">0</div>
+                        <div class="stat-label">Active Tips</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statHistoryDays">0</div>
+                        <div class="stat-label">History Days</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statNewsItems">0</div>
+                        <div class="stat-label">News Items</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statWinRate">0%</div>
+                        <div class="stat-label">Win Rate</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">⚡ Quick Actions</div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                        <button class="btn btn-primary" onclick="showPage('tips')">
+                            ➕ Add New Tips
+                        </button>
+                        <button class="btn btn-success" onclick="showPage('results')">
+                            ✅ Update Results
+                        </button>
+                        <button class="btn btn-warning" onclick="showPage('export')">
+                            📤 Export to Site
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">📋 Recent Activity</div>
+                    </div>
+                    <div id="recentActivity">
+                        <p style="color: var(--text-secondary);">No recent activity</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Daily Tips Page -->
+            <div class="page-section" id="page-tips">
+                <div class="page-header">
+                    <div class="page-title">Daily Tips Management</div>
+                    <div class="page-actions">
+                        <button class="btn btn-secondary" onclick="archiveAllTips()">
+                            📁 Archive All
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">➕ Add New Tip</div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">League</label>
+                            <input type="text" class="form-input" id="tipLeague" placeholder="e.g., Premier League">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Match Time</label>
+                            <input type="time" class="form-input" id="tipTime">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Home Team</label>
+                            <input type="text" class="form-input" id="tipHomeTeam" placeholder="e.g., Arsenal">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Away Team</label>
+                            <input type="text" class="form-input" id="tipAwayTeam" placeholder="e.g., Chelsea">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Prediction</label>
+                            <select class="form-select" id="tipPrediction">
+                                <option value="Over 2.5">Over 2.5</option>
+                                <option value="Under 2.5">Under 2.5</option>
+                                <option value="Home Win">Home Win</option>
+                                <option value="Away Win">Away Win</option>
+                                <option value="Draw">Draw</option>
+                                <option value="BTTS Yes">BTTS Yes</option>
+                                <option value="BTTS No">BTTS No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Odds</label>
+                            <input type="text" class="form-input" id="tipOdds" placeholder="e.g., 1.85">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Confidence %</label>
+                            <input type="number" class="form-input" id="tipConfidence" placeholder="75" min="1" max="100">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="addTip()" style="width: 100%;">
+                        ➕ Add Tip
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">📋 Active Tips (Will be shown on website)</div>
+                    </div>
+                    <div id="activeTipsList">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Update Results Page -->
+            <div class="page-section" id="page-results">
+                <div class="page-header">
+                    <div class="page-title">Update Match Results</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">📅 Select Date</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Choose date to update results</label>
+                        <select class="form-select" id="resultDateSelect" onchange="loadResultsForDate()">
+                            <option value="">-- Select Date --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="resultsContainer">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- History Archive Page -->
+            <div class="page-section" id="page-history">
+                <div class="page-header">
+                    <div class="page-title">History Archive</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">📁 Archived History</div>
+                    </div>
+                    <div id="historyArchiveList">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- News Page -->
+            <div class="page-section" id="page-news">
+                <div class="page-header">
+                    <div class="page-title">News Management</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">➕ Add News Article</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Category</label>
+                        <select class="form-select" id="newsCategory">
+                            <option value="Transfer">Transfer</option>
+                            <option value="Injury">Injury</option>
+                            <option value="Match Preview">Match Preview</option>
+                            <option value="Analysis">Analysis</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Title</label>
+                        <input type="text" class="form-input" id="newsTitle" placeholder="News headline">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Preview Text</label>
+                        <textarea class="form-textarea" id="newsPreview" placeholder="Short preview..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Image (emoji or URL)</label>
+                        <input type="text" class="form-input" id="newsImage" placeholder="⚽ or https://...">
+                    </div>
+                    <button class="btn btn-primary" onclick="addNews()" style="width: 100%;">
+                        ➕ Post News
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">📰 All News (Last 4 shown on homepage)</div>
+                    </div>
+                    <div id="newsList">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Banners Page -->
+            <div class="page-section" id="page-banners">
+                <div class="page-header">
+                    <div class="page-title">Banner Management</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">➕ Add Banner</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Banner Title</label>
+                        <input type="text" class="form-input" id="bannerTitle" placeholder="Headline text">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Subtitle</label>
+                        <input type="text" class="form-input" id="bannerSubtitle" placeholder="Subtitle text">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Image URL (optional)</label>
+                        <input type="text" class="form-input" id="bannerImage" placeholder="https://...">
+                    </div>
+                    <button class="btn btn-primary" onclick="addBanner()" style="width: 100%;">
+                        ➕ Add Banner
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">🖼️ Active Banners</div>
+                    </div>
+                    <div id="bannersList">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pro Results Page -->
+            <div class="page-section" id="page-pro">
+                <div class="page-header">
+                    <div class="page-title">Pro Results Management</div>
+                </div>
+
+                <div class="tabs">
+                    <button class="tab active" onclick="switchProTab('single')">Single Bankaa</button>
+                    <button class="tab" onclick="switchProTab('profit')">Profit Bankaa</button>
+                    <button class="tab" onclick="switchProTab('acca')">ACCA Bankaa</button>
+                </div>
+
+                <!-- Single Bankaa -->
+                <div class="pro-section active" id="pro-single">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">📊 Single Bankaa Stats</div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Yesterday Result</label>
+                                <select class="form-select" id="singleYesterday">
+                                    <option value="WON">WON</option>
+                                    <option value="LOST">LOST</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Last Week Record</label>
+                                <input type="text" class="form-input" id="singleLastWeek" placeholder="e.g., 5 Won, 2 Lost">
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="updateSingleStats()" style="width: 100%;">
+                            💾 Update Stats
+                        </button>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">📅 Add Past Result</div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Date</label>
+                                <input type="date" class="form-input" id="singleDate">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Result</label>
+                                <select class="form-select" id="singleResult">
+                                    <option value="won">Won ✅</option>
+                                    <option value="lost">Lost ❌</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary" onclick="addSingleResult()" style="width: 100%;">
+                            ➕ Add Result
+                        </button>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">📋 Last 7 Days</div>
+                        </div>
+                        <div id="singleResultsList">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profit Bankaa -->
+                <div class="pro-section" id="pro-profit" style="display: none;">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">📊 Profit Bankaa Stats</div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Yesterday ROI %</label>
+                                <input type="text" class="form-input" id="profitYesterday" placeholder="e.g., 45%">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Last Week ROI %</label>
+                                <input type="text" class="form-input" id="profitLastWeek" placeholder="e.g., 115%">
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="updateProfitStats()" style="width: 100%;">
+                            💾 Update Stats
+                        </button>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">📅 Add Daily ROI</div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Date</label>
+                                <input type="date" class="form-input" id="profitDate">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">ROI %</label>
+                                <input type="text" class="form-input" id="profitRoi" placeholder="e.g., 38%">
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary" onclick="addProfitResult()" style="width: 100%;">
+                            ➕ Add ROI
+                        </button>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">📋 Last 7 Days ROI</div>
+                        </div>
+                        <div id="profitResultsList">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ACCA Bankaa -->
+                <div class="pro-section" id="pro-acca" style="display: none;">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">📊 ACCA Bankaa Stats</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Total Odds Won Last Month</label>
+                            <input type="text" class="form-input" id="accaTotalOdds" placeholder="e.g., 265">
+                        </div>
+                        <button class="btn btn-primary" onclick="updateAccaStats()" style="width: 100%;">
+                            💾 Update Stats
+                        </button>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">📅 Add Daily ACCA Result</div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Date</label>
+                                <input type="date" class="form-input" id="accaDate">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Odds</label>
+                                <input type="text" class="form-input" id="accaOdds" placeholder="e.g., 45">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Result</label>
+                                <select class="form-select" id="accaResult">
+                                    <option value="won">Won ✅</option>
+                                    <option value="lost">Lost ❌</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary" onclick="addAccaResult()" style="width: 100%;">
+                            ➕ Add Result
+                        </button>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">📋 Last 7 Days</div>
+                        </div>
+                        <div id="accaResultsList">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Page -->
+            <div class="page-section" id="page-settings">
+                <div class="page-header">
+                    <div class="page-title">Site Settings</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">🏷️ Logo Settings</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Logo (emoji or image URL)</label>
+                        <input type="text" class="form-input" id="logoSetting" value="B">
+                    </div>
+                    <button class="btn btn-primary" onclick="updateLogo()" style="width: 100%;">
+                        💾 Update Logo
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">📢 Alert Ticker</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Show Ticker</label>
+                        <select class="form-select" id="tickerShow">
+                            <option value="true">Yes</option>
+                            <option value="false">No</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Ticker Text</label>
+                        <textarea class="form-textarea" id="tickerText">🔥 Welcome to BankaaTips! Check out our latest winning predictions and join our Telegram for exclusive tips!</textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="updateTicker()" style="width: 100%;">
+                        💾 Update Ticker
+                    </button>
+                </div>
+            </div>
+
+            <!-- Export Page -->
+            <div class="page-section" id="page-export">
+                <div class="page-header">
+                    <div class="page-title">Export to Website</div>
+                </div>
+
+                <div class="export-section">
+                    <div style="font-size: 48px; margin-bottom: 16px;">📤</div>
+                    <h2 style="margin-bottom: 12px;">Export Data to Main Website</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 24px;">
+                        Copy the code below and paste it into the main website's data import section.<br>
+                        Or add <code>?admin=1</code> to the website URL to show the import panel.
+                    </p>
+                    
+                    <textarea class="export-textarea" id="exportData" readonly></textarea>
+                    
+                    <button class="btn btn-primary" onclick="generateExport()" style="margin-bottom: 12px;">
+                        🔄 Generate Export Code
+                    </button>
+                    <button class="btn btn-success" onclick="copyExport()" style="width: 100%;">
+                        📋 Copy to Clipboard
+                    </button>
+                </div>
+
+                <div class="card" style="margin-top: 24px;">
+                    <div class="card-header">
+                        <div class="card-title">📥 How to Import</div>
+                    </div>
+                    <ol style="color: var(--text-secondary); line-height: 2; padding-left: 20px;">
+                        <li>Copy the export code above</li>
+                        <li>Open the main website (index.html)</li>
+                        <li>Add <code>?admin=1</code> to the URL and refresh</li>
+                        <li>Paste the code in the import section that appears</li>
+                        <li>Click "Import Data"</li>
+                        <li>Done! The website will update with your changes</li>
+                    </ol>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // ==================== AUTHENTICATION ====================
+        
+        const ADMIN_PASSWORD = "221995";
+
+        function login() {
+            const input = document.getElementById('loginPassword').value;
+            if (input === ADMIN_PASSWORD) {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('adminLayout').classList.add('show');
+                loadAllData();
+                updateStats();
+            } else {
+                document.getElementById('loginError').style.display = 'block';
+                document.getElementById('loginPassword').value = '';
+            }
+        }
+
+        document.getElementById('loginPassword').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') login();
+        });
+
+        function logout() {
+            location.reload();
+        }
+
+        // ==================== DATA STORAGE ====================
+
+        let adminData = {
+            dailyTips: [],
+            historyData: [],
+            newsData: [],
+            bannerData: [],
+            proResults: {
+                single: { yesterday: "WON", lastWeek: "5 Won, 2 Lost", pastResults: [] },
+                profit: { yesterday: "45%", lastWeek: "115%", pastResults: [] },
+                acca: { totalOddsLastMonth: "265", pastResults: [] }
+            },
+            settings: {
+                logo: { type: 'emoji', value: 'B' },
+                ticker: { show: true, text: '🔥 Welcome to BankaaTips! Check out our latest winning predictions and join our Telegram for exclusive tips!' }
+            }
+        };
+
+        function loadAllData() {
+            const stored = localStorage.getItem('bankaaAdminData');
+            if (stored) {
+                try {
+                    adminData = JSON.parse(stored);
+                } catch (e) {
+                    console.error('Failed to load stored data');
+                }
+            }
+            renderAll();
+        }
+
+        function saveData() {
+            localStorage.setItem('bankaaAdminData', JSON.stringify(adminData));
+        }
+
+        // ==================== NAVIGATION ====================
+
+        function showPage(page) {
+            // Update sidebar
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+
+            // Update page content
+            document.querySelectorAll('.page-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById('page-' + page).classList.add('active');
+
+            // Refresh data
+            if (page === 'results') populateResultDates();
+            if (page === 'export') generateExport();
+        }
+
+        function switchProTab(type) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.pro-section').forEach(s => s.style.display = 'none');
+            
+            event.target.classList.add('active');
+            document.getElementById('pro-' + type).style.display = 'block';
+        }
+
+        // ==================== DAILY TIPS ====================
+
+        function addTip() {
+            const tip = {
+                id: Date.now(),
+                league: document.getElementById('tipLeague').value,
+                homeTeam: document.getElementById('tipHomeTeam').value,
+                awayTeam: document.getElementById('tipAwayTeam').value,
+                prediction: document.getElementById('tipPrediction').value,
+                odds: document.getElementById('tipOdds').value,
+                confidence: document.getElementById('tipConfidence').value || 70,
+                time: document.getElementById('tipTime').value || '15:00',
+                homeEmoji: '⚽',
+                awayEmoji: '⚽',
+                date: new Date().toISOString().split('T')[0],
+                result: 'pending',
+                score: ''
+            };
+
+            if (!tip.league || !tip.homeTeam || !tip.awayTeam || !tip.odds) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            adminData.dailyTips.push(tip);
+            saveData();
+            renderTips();
+            updateStats();
+
+            // Clear form
+            document.getElementById('tipLeague').value = '';
+            document.getElementById('tipHomeTeam').value = '';
+            document.getElementById('tipAwayTeam').value = '';
+            document.getElementById('tipOdds').value = '';
+            document.getElementById('tipConfidence').value = '';
+        }
+
+        function deleteTip(id) {
+            adminData.dailyTips = adminData.dailyTips.filter(t => t.id !== id);
+            saveData();
+            renderTips();
+            updateStats();
+        }
+
+        function archiveAllTips() {
+            if (adminData.dailyTips.length === 0) {
+                alert('No tips to archive!');
+                return;
+            }
+
+            const today = new Date();
+            const dateStr = today.toISOString().split('T')[0];
+            const displayDate = today.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+
+            const archivedDay = {
+                date: dateStr,
+                displayDate: displayDate,
+                results: adminData.dailyTips.map(tip => ({
+                    id: tip.id,
+                    match: `${tip.homeTeam} vs ${tip.awayTeam}`,
+                    prediction: tip.prediction,
+                    score: tip.score || '-:-',
+                    result: tip.result
+                }))
+            };
+
+            // Check if date exists
+            const existingIndex = adminData.historyData.findIndex(h => h.date === dateStr);
+            if (existingIndex >= 0) {
+                adminData.historyData[existingIndex].results.push(...archivedDay.results);
+            } else {
+                adminData.historyData.unshift(archivedDay);
+            }
+
+            // Clear daily tips
+            adminData.dailyTips = [];
+            saveData();
+            renderTips();
+            renderHistory();
+            updateStats();
+
+            alert(`Archived ${archivedDay.results.length} tips to history!`);
+        }
+
+        // ==================== UPDATE RESULTS ====================
+
+        function populateResultDates() {
+            const select = document.getElementById('resultDateSelect');
+            select.innerHTML = '<option value="">-- Select Date --</option>';
+            
+            // Add dates from history
+            adminData.historyData.forEach(day => {
+                const option = document.createElement('option');
+                option.value = day.date;
+                option.textContent = `${day.displayDate} (${day.results.length} matches)`;
+                select.appendChild(option);
+            });
+
+            // Add today's tips if any
+            if (adminData.dailyTips.length > 0) {
+                const today = new Date();
+                const todayStr = today.toISOString().split('T')[0];
+                const todayDisplay = today.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+                
+                const option = document.createElement('option');
+                option.value = todayStr;
+                option.textContent = `${todayDisplay} - TODAY (${adminData.dailyTips.length} tips)`;
+                select.insertBefore(option, select.children[1]);
+            }
+        }
+
+        function loadResultsForDate() {
+            const date = document.getElementById('resultDateSelect').value;
+            const container = document.getElementById('resultsContainer');
+            
+            if (!date) {
+                container.innerHTML = '';
+                return;
+            }
+
+            // Check daily tips first
+            let tips = adminData.dailyTips.filter(t => t.date === date);
+            let fromHistory = false;
+
+            // If not in daily tips, check history
+            if (tips.length === 0) {
+                const historyDay = adminData.historyData.find(h => h.date === date);
+                if (historyDay) {
+                    tips = historyDay.results.map(r => ({
+                        ...r,
+                        homeTeam: r.match.split(' vs ')[0],
+                        awayTeam: r.match.split(' vs ')[1]
+                    }));
+                    fromHistory = true;
+                }
+            }
+
+            if (tips.length === 0) {
+                container.innerHTML = '<div class="card"><p style="color: var(--text-secondary); text-align: center;">No matches found for this date</p></div>';
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">📋 Matches for ${date}</div>
+                    </div>
+                    ${tips.map((tip, idx) => `
+                        <div class="list-item" style="flex-direction: column; align-items: stretch; margin-bottom: 16px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <div>
+                                    <div class="list-item-title">${tip.homeTeam || tip.match.split(' vs ')[0]} vs ${tip.awayTeam || tip.match.split(' vs ')[1]}</div>
+                                    <div class="list-item-sub">Prediction: ${tip.prediction}</div>
+                                </div>
+                                <span class="badge ${tip.result === 'won' ? 'badge-success' : tip.result === 'lost' ? 'badge-danger' : 'badge-warning'}">
+                                    ${tip.result === 'pending' ? 'PENDING' : tip.result.toUpperCase()}
+                                </span>
+                            </div>
+                            <div class="result-form">
+                                <input type="text" id="score-${date}-${idx}" placeholder="Score (e.g., 2-1)" value="${tip.score || ''}">
+                                <select id="result-${date}-${idx}">
+                                    <option value="pending" ${tip.result === 'pending' ? 'selected' : ''}>Pending</option>
+                                    <option value="won" ${tip.result === 'won' ? 'selected' : ''}>Won ✅</option>
+                                    <option value="lost" ${tip.result === 'lost' ? 'selected' : ''}>Lost ❌</option>
+                                </select>
+                                <button class="btn btn-small btn-success" onclick="saveResult('${date}', ${idx}, ${fromHistory})">
+                                    💾 Save
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function saveResult(date, idx, fromHistory) {
+            const score = document.getElementById(`score-${date}-${idx}`).value;
+            const result = document.getElementById(`result-${date}-${idx}`).value;
+
+            if (fromHistory) {
+                const historyDay = adminData.historyData.find(h => h.date === date);
+                if (historyDay) {
+                    historyDay.results[idx].score = score;
+                    historyDay.results[idx].result = result;
+                }
+            } else {
+                adminData.dailyTips[idx].score = score;
+                adminData.dailyTips[idx].result = result;
+            }
+
+            saveData();
+            loadResultsForDate();
+            updateStats();
+            
+            alert('Result saved!');
+        }
+
+        // ==================== NEWS ====================
+
+        function addNews() {
+            const news = {
+                id: Date.now(),
+                category: document.getElementById('newsCategory').value,
+                title: document.getElementById('newsTitle').value,
+                preview: document.getElementById('newsPreview').value,
+                image: document.getElementById('newsImage').value || '📰',
+                time: 'Just now'
+            };
+
+            if (!news.title || !news.preview) {
+                alert('Please fill in title and preview');
+                return;
+            }
+
+            adminData.newsData.unshift(news);
+            saveData();
+            renderNews();
+
+            document.getElementById('newsTitle').value = '';
+            document.getElementById('newsPreview').value = '';
+            document.getElementById('newsImage').value = '';
+        }
+
+        function deleteNews(id) {
+            adminData.newsData = adminData.newsData.filter(n => n.id !== id);
+            saveData();
+            renderNews();
+        }
+
+        // ==================== BANNERS ====================
+
+        function addBanner() {
+            const banner = {
+                id: Date.now(),
+                title: document.getElementById('bannerTitle').value,
+                subtitle: document.getElementById('bannerSubtitle').value,
+                image: document.getElementById('bannerImage').value,
+                gradient: 'linear-gradient(135deg, #1a1a2e, #16213e)'
+            };
+
+            if (!banner.title || !banner.subtitle) {
+                alert('Please fill in title and subtitle');
+                return;
+            }
+
+            adminData.bannerData.push(banner);
+            saveData();
+            renderBanners();
+
+            document.getElementById('bannerTitle').value = '';
+            document.getElementById('bannerSubtitle').value = '';
+            document.getElementById('bannerImage').value = '';
+        }
+
+        function deleteBanner(id) {
+            adminData.bannerData = adminData.bannerData.filter(b => b.id !== id);
+            saveData();
+            renderBanners();
+        }
+
+        // ==================== PRO RESULTS ====================
+
+        function updateSingleStats() {
+            adminData.proResults.single.yesterday = document.getElementById('singleYesterday').value;
+            adminData.proResults.single.lastWeek = document.getElementById('singleLastWeek').value;
+            saveData();
+            alert('Single Bankaa stats updated!');
+        }
+
+        function addSingleResult() {
+            const date = document.getElementById('singleDate').value;
+            const result = document.getElementById('singleResult').value;
+            
+            if (!date) {
+                alert('Please select a date');
+                return;
+            }
+
+            const displayDate = new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            adminData.proResults.single.pastResults.unshift({
+                date: displayDate,
+                result: result,
+                display: result === 'won' ? 'WON' : 'LOST'
+            });
+
+            // Keep only last 7
+            adminData.proResults.single.pastResults = adminData.proResults.single.pastResults.slice(0, 7);
+            saveData();
+            renderProResults();
+            
+            document.getElementById('singleDate').value = '';
+        }
+
+        function updateProfitStats() {
+            adminData.proResults.profit.yesterday = document.getElementById('profitYesterday').value;
+            adminData.proResults.profit.lastWeek = document.getElementById('profitLastWeek').value;
+            saveData();
+            alert('Profit Bankaa stats updated!');
+        }
+
+        function addProfitResult() {
+            const date = document.getElementById('profitDate').value;
+            const roi = document.getElementById('profitRoi').value;
+            
+            if (!date || !roi) {
+                alert('Please fill in date and ROI');
+                return;
+            }
+
+            const displayDate = new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            adminData.proResults.profit.pastResults.unshift({
+                date: displayDate,
+                roi: roi
+            });
+
+            adminData.proResults.profit.pastResults = adminData.proResults.profit.pastResults.slice(0, 7);
+            saveData();
+            renderProResults();
+            
+            document.getElementById('profitDate').value = '';
+            document.getElementById('profitRoi').value = '';
+        }
+
+        function updateAccaStats() {
+            adminData.proResults.acca.totalOddsLastMonth = document.getElementById('accaTotalOdds').value;
+            saveData();
+            alert('ACCA Bankaa stats updated!');
+        }
+
+        function addAccaResult() {
+            const date = document.getElementById('accaDate').value;
+            const odds = document.getElementById('accaOdds').value;
+            const result = document.getElementById('accaResult').value;
+            
+            if (!date || !odds) {
+                alert('Please fill in date and odds');
+                return;
+            }
+
+            const displayDate = new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            adminData.proResults.acca.pastResults.unshift({
+                date: displayDate,
+                odds: odds.replace('odds', '').trim(),
+                status: result
+            });
+
+            adminData.proResults.acca.pastResults = adminData.proResults.acca.pastResults.slice(0, 7);
+            saveData();
+            renderProResults();
+            
+            document.getElementById('accaDate').value = '';
+            document.getElementById('accaOdds').value = '';
+        }
+
+        // ==================== SETTINGS ====================
+
+        function updateLogo() {
+            const value = document.getElementById('logoSetting').value;
+            adminData.settings.logo = {
+                type: value.startsWith('http') ? 'image' : 'emoji',
+                value: value
+            };
+            saveData();
+            alert('Logo updated!');
+        }
+
+        function updateTicker() {
+            adminData.settings.ticker = {
+                show: document.getElementById('tickerShow').value === 'true',
+                text: document.getElementById('tickerText').value
+            };
+            saveData();
+            alert('Ticker updated!');
+        }
+
+        // ==================== EXPORT ====================
+
+        function generateExport() {
+            const exportPayload = {
+                logoSettings: adminData.settings.logo,
+                tickerSettings: adminData.settings.ticker,
+                bannerData: adminData.bannerData,
+                freeTips: adminData.dailyTips,
+                newsData: adminData.newsData,
+                historyData: adminData.historyData,
+                proResults: adminData.proResults
+            };
+
+            const encoded = btoa(JSON.stringify(exportPayload));
+            document.getElementById('exportData').value = encoded;
+        }
+
+        function copyExport() {
+            const textarea = document.getElementById('exportData');
+            textarea.select();
+            document.execCommand('copy');
+            alert('Export code copied to clipboard! 📋');
+        }
+
+        // ==================== RENDER FUNCTIONS ====================
+
+        function renderTips() {
+            const container = document.getElementById('activeTipsList');
+            
+            if (adminData.dailyTips.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 40px;">No active tips. Add some above!</p>';
+                return;
+            }
+
+            container.innerHTML = adminData.dailyTips.map(tip => `
+                <div class="list-item">
+                    <div class="list-item-info">
+                        <div class="list-item-title">${tip.homeTeam} vs ${tip.awayTeam}</div>
+                        <div class="list-item-sub">${tip.league} • ${tip.prediction} @ ${tip.odds} • ${tip.time}</div>
+                    </div>
+                    <div class="list-item-actions">
+                        <span class="badge ${tip.result === 'won' ? 'badge-success' : tip.result === 'lost' ? 'badge-danger' : 'badge-warning'}">
+                            ${tip.result === 'pending' ? 'PENDING' : tip.result.toUpperCase()}
+                        </span>
+                        <button class="btn-small btn-danger" onclick="deleteTip(${tip.id})">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('historyArchiveList');
+            
+            if (adminData.historyData.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 40px;">No archived history yet.</p>';
+                return;
+            }
+
+            container.innerHTML = adminData.historyData.map(day => `
+                <div class="list-item" style="flex-direction: column; align-items: stretch;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <div class="list-item-title">${day.displayDate}</div>
+                        <span class="badge badge-info">${day.results.length} matches</span>
+                    </div>
+                    <div style="color: var(--text-secondary); font-size: 13px;">
+                        ${day.results.slice(0, 3).map(r => `• ${r.match}: ${r.result.toUpperCase()}`).join('<br>')}
+                        ${day.results.length > 3 ? `<br>... and ${day.results.length - 3} more` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderNews() {
+            const container = document.getElementById('newsList');
+            
+            if (adminData.newsData.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 40px;">No news articles yet.</p>';
+                return;
+            }
+
+            container.innerHTML = adminData.newsData.map((news, idx) => `
+                <div class="list-item">
+                    <div class="list-item-info">
+                        <div class="list-item-title">${news.image} ${news.title}</div>
+                        <div class="list-item-sub">${news.category} • ${news.time}</div>
+                    </div>
+                    <div class="list-item-actions">
+                        ${idx < 4 ? '<span class="badge badge-success">HOME</span>' : ''}
+                        <button class="btn-small btn-danger" onclick="deleteNews(${news.id})">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderBanners() {
+            const container = document.getElementById('bannersList');
+            
+            if (adminData.bannerData.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 40px;">No banners yet.</p>';
+                return;
+            }
+
+            container.innerHTML = adminData.bannerData.map((banner, idx) => `
+                <div class="list-item">
+                    <div class="list-item-info">
+                        <div class="list-item-title">${idx + 1}. ${banner.title}</div>
+                        <div class="list-item-sub">${banner.subtitle}</div>
+                    </div>
+                    <div class="list-item-actions">
+                        <button class="btn-small btn-danger" onclick="deleteBanner(${banner.id})">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderProResults() {
+            // Single
+            document.getElementById('singleResultsList').innerHTML = adminData.proResults.single.pastResults.map(r => `
+                <div class="list-item">
+                    <div class="list-item-info">
+                        <div class="list-item-title">${r.date}</div>
+                    </div>
+                    <span class="badge ${r.result === 'won' ? 'badge-success' : 'badge-danger'}">${r.display}</span>
+                </div>
+            `).join('') || '<p style="color: var(--text-secondary); text-align: center;">No results yet</p>';
+
+            // Profit
+            document.getElementById('profitResultsList').innerHTML = adminData.proResults.profit.pastResults.map(r => `
+                <div class="list-item">
+                    <div class="list-item-info">
+                        <div class="list-item-title">${r.date}</div>
+                    </div>
+                    <span class="badge badge-warning">${r.roi}</span>
+                </div>
+            `).join('') || '<p style="color: var(--text-secondary); text-align: center;">No results yet</p>';
+
+            // ACCA
+            document.getElementById('accaResultsList').innerHTML = adminData.proResults.acca.pastResults.map(r => `
+                <div class="list-item">
+                    <div class="list-item-info">
+                        <div class="list-item-title">${r.date}</div>
+                        <div class="list-item-sub">${r.odds} odds</div>
+                    </div>
+                    <span class="badge ${r.status === 'won' ? 'badge-success' : 'badge-danger'}">${r.status.toUpperCase()}</span>
+                </div>
+            `).join('') || '<p style="color: var(--text-secondary); text-align: center;">No results yet</p>';
+        }
+
+        function updateStats() {
+            document.getElementById('statTotalTips').textContent = adminData.dailyTips.length;
+            document.getElementById('statHistoryDays').textContent = adminData.historyData.length;
+            document.getElementById('statNewsItems').textContent = adminData.newsData.length;
+            
+            // Calculate win rate from history
+            let total = 0, wins = 0;
+            adminData.historyData.forEach(day => {
+                day.results.forEach(r => {
+                    if (r.result !== 'pending') {
+                        total++;
+                        if (r.result === 'won') wins++;
+                    }
+                });
+            });
+            const rate = total > 0 ? Math.round((wins / total) * 100) : 0;
+            document.getElementById('statWinRate').textContent = rate + '%';
+        }
+
+        function renderAll() {
+            renderTips();
+            renderHistory();
+            renderNews();
+            renderBanners();
+            renderProResults();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set default dates
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('singleDate').value = today;
+            document.getElementById('profitDate').value = today;
+            document.getElementById('accaDate').value = today;
+        });
+    </script>
+</body>
+</html>

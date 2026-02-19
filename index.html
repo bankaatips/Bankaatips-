@@ -1,0 +1,2092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BankaaTips - Smart Sports Predictions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #16C784;
+            --primary-dark: #12a56d;
+            --bg-dark: #0a0a0f;
+            --bg-card: #141419;
+            --bg-card-hover: #1a1a22;
+            --text-primary: #ffffff;
+            --text-secondary: #8b8b9e;
+            --border: #2a2a35;
+            --success: #16C784;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        [data-theme="light"] {
+            --bg-dark: #f5f5f7;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f0f0f5;
+            --text-primary: #1a1a2e;
+            --text-secondary: #6b7280;
+            --border: #e5e7eb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            max-width: 480px;
+            margin: 0 auto;
+            position: relative;
+            overflow-x: hidden;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* Alert Ticker */
+        .alert-ticker {
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 10px 0;
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+            display: none;
+        }
+
+        .alert-ticker.show {
+            display: block;
+        }
+
+        .ticker-content {
+            display: inline-block;
+            padding-left: 100%;
+            animation: ticker 20s linear infinite;
+        }
+
+        @keyframes ticker {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* Header */
+        .header {
+            padding: 16px 20px;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 20px;
+            color: white;
+            overflow: hidden;
+        }
+
+        .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding-bottom: 100px;
+            min-height: calc(100vh - 140px);
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Banner Carousel */
+        .banner-carousel {
+            position: relative;
+            margin: 16px 20px;
+            border-radius: 16px;
+            overflow: hidden;
+            height: 180px;
+        }
+
+        .banner-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 20px;
+        }
+
+        .banner-slide.active {
+            opacity: 1;
+        }
+
+        .banner-slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%);
+        }
+
+        .banner-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .banner-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: white;
+        }
+
+        .banner-subtitle {
+            font-size: 13px;
+            opacity: 0.9;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .banner-dots {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 2;
+        }
+
+        .banner-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.4);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .banner-dot.active {
+            background: var(--primary);
+            width: 20px;
+            border-radius: 4px;
+        }
+
+        /* Telegram CTA Button */
+        .telegram-cta {
+            margin: 16px 20px;
+            background: linear-gradient(135deg, #0088cc, #006699);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: white;
+        }
+
+        .telegram-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 136, 204, 0.3);
+        }
+
+        .telegram-icon {
+            width: 56px;
+            height: 56px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+
+        .telegram-content {
+            flex: 1;
+        }
+
+        .telegram-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .telegram-subtitle {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .telegram-arrow {
+            font-size: 24px;
+            opacity: 0.8;
+        }
+
+        /* Section Title */
+        .section-title {
+            padding: 20px 20px 12px;
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .view-all {
+            font-size: 13px;
+            color: var(--primary);
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        /* Tip Cards */
+        .tips-container {
+            padding: 0 20px;
+        }
+
+        .tip-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.2s;
+        }
+
+        .tip-card:hover {
+            background: var(--bg-card-hover);
+            transform: translateY(-2px);
+        }
+
+        .tip-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .league-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .league-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+        }
+
+        .match-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .match-teams {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .team {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .team-logo {
+            width: 40px;
+            height: 40px;
+            background: var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .team-name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .vs {
+            font-size: 12px;
+            color: var(--text-secondary);
+            padding: 0 12px;
+        }
+
+        .prediction-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .prediction-box {
+            flex: 1;
+            background: var(--bg-dark);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .prediction-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .prediction-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .confidence-bar {
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        /* Results Cards */
+        .result-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .result-date {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .result-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .result-badge.won {
+            background: rgba(22, 199, 132, 0.15);
+            color: var(--success);
+        }
+
+        .result-badge.lost {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+        }
+
+        .result-badge.pending {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+        }
+
+        .result-teams {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .result-score {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .result-prediction {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Date Group */
+        .date-group {
+            margin-bottom: 20px;
+        }
+
+        .date-header {
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* News Cards */
+        .news-container {
+            padding: 0 20px;
+        }
+
+        .news-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .news-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .news-image {
+            height: 160px;
+            background: linear-gradient(135deg, var(--border), var(--bg-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .news-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .news-image-placeholder {
+            position: absolute;
+            font-size: 48px;
+        }
+
+        .news-content {
+            padding: 16px;
+        }
+
+        .news-meta {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .news-category {
+            font-size: 11px;
+            color: var(--primary);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .news-time {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .news-title {
+            font-size: 15px;
+            font-weight: 600;
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+
+        .news-preview {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Pro Section */
+        .pro-types-header {
+            padding: 20px;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(22, 199, 132, 0.1), rgba(22, 199, 132, 0.05));
+            margin: 0 20px 20px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .pro-types-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--primary);
+        }
+
+        .pro-types-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .pro-packages {
+            padding: 0 20px;
+        }
+
+        .pro-card {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        [data-theme="light"] .pro-card {
+            background: linear-gradient(135deg, #f0f0f5, #e8e8f0);
+        }
+
+        .pro-badge {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #1a1a2e;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .pro-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .pro-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .pro-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        [data-theme="light"] .stat-box {
+            background: rgba(0,0,0,0.05);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .pro-results {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        [data-theme="light"] .pro-results {
+            background: rgba(0,0,0,0.05);
+        }
+
+        .pro-results-title {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+        }
+
+        .results-scroll {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            scrollbar-width: none;
+        }
+
+        .results-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .mini-result {
+            flex-shrink: 0;
+            background: var(--bg-card);
+            border-radius: 10px;
+            padding: 12px;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .mini-result-date {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .mini-result-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .mini-result-value {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .mini-result-status {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .pro-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+        }
+
+        .pro-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* Account Section */
+        .account-section {
+            padding: 20px;
+        }
+
+        .account-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .account-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+        }
+
+        .account-name {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .account-type {
+            font-size: 14px;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .settings-list {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .setting-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-item:hover {
+            background: var(--bg-card-hover);
+        }
+
+        .setting-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .setting-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--bg-dark);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .setting-text {
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .setting-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toggle-switch {
+            width: 48px;
+            height: 26px;
+            background: var(--border);
+            border-radius: 13px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: var(--primary);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(22px);
+        }
+
+        /* Disclaimer */
+        .disclaimer {
+            margin: 24px 20px;
+            padding: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .disclaimer-title {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .disclaimer-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .empty-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            background: none;
+            color: var(--text-secondary);
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        .nav-label {
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        /* Stats Section */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            padding: 0 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .stat-card-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-card-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Back button for history section */
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-bottom: 12px;
+            padding: 0 20px;
+        }
+
+        /* Data Import Section (for admin use) */
+        .data-import {
+            display: none;
+            padding: 20px;
+            background: var(--bg-card);
+            border: 2px dashed var(--border);
+            border-radius: 16px;
+            margin: 20px;
+        }
+
+        .data-import.show {
+            display: block;
+        }
+
+        .data-import-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .data-import textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 12px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: monospace;
+            font-size: 12px;
+            resize: vertical;
+        }
+
+        .data-import-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Alert Ticker -->
+    <div class="alert-ticker" id="alertTicker">
+        <div class="ticker-content" id="tickerText">🔥 Welcome to BankaaTips! Check out our latest winning predictions and join our Telegram for exclusive tips!</div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon" id="logoIcon">B</div>
+                <div class="logo-text">BankaaTips</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- HOME SECTION -->
+        <section class="section active" id="homeSection">
+            <!-- Banner Carousel -->
+            <div class="banner-carousel" id="bannerCarousel">
+                <div class="banner-slide active" style="background-image: linear-gradient(135deg, #1a1a2e, #16213e);">
+                    <div class="banner-content">
+                        <div class="banner-title">🔥 Hot Streak!</div>
+                        <div class="banner-subtitle">Yesterday: 4 Wins, 1 Loss | 80% Success Rate</div>
+                    </div>
+                </div>
+                <div class="banner-slide" style="background-image: linear-gradient(135deg, #16C784, #12a56d);">
+                    <div class="banner-content">
+                        <div class="banner-title">Join Our Telegram</div>
+                        <div class="banner-subtitle">Get exclusive tips and instant updates</div>
+                    </div>
+                </div>
+                <div class="banner-slide" style="background-image: linear-gradient(135deg, #f59e0b, #d97706);">
+                    <div class="banner-content">
+                        <div class="banner-title">Pro Tips Available</div>
+                        <div class="banner-subtitle">Upgrade for high-confidence predictions</div>
+                    </div>
+                </div>
+                <div class="banner-dots">
+                    <div class="banner-dot active" onclick="goToSlide(0)"></div>
+                    <div class="banner-dot" onclick="goToSlide(1)"></div>
+                    <div class="banner-dot" onclick="goToSlide(2)"></div>
+                </div>
+            </div>
+
+            <!-- Telegram CTA After Banner -->
+            <a href="https://t.me/bankaabet" class="telegram-cta" target="_blank">
+                <div class="telegram-icon">✈️</div>
+                <div class="telegram-content">
+                    <div class="telegram-title">Join Our Telegram Channel</div>
+                    <div class="telegram-subtitle">Get exclusive tips, instant updates & daily predictions</div>
+                </div>
+                <div class="telegram-arrow">›</div>
+            </a>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-card-value" id="winRate">78%</div>
+                    <div class="stat-card-label">Win Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-value" id="totalTips">156</div>
+                    <div class="stat-card-label">Total Tips</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-value" id="profit">+42%</div>
+                    <div class="stat-card-label">Profit</div>
+                </div>
+            </div>
+
+            <!-- Yesterday's Results -->
+            <div class="section-title">
+                Yesterday's Results
+                <span class="view-all" onclick="switchTab('history')">View History</span>
+            </div>
+            <div class="tips-container" id="yesterdayResults">
+                <!-- Populated by JS -->
+            </div>
+
+            <!-- Latest News (Last 4) -->
+            <div class="section-title">
+                Latest News
+                <span class="view-all" onclick="switchTab('news')">View All</span>
+            </div>
+            <div class="news-container" id="homeNewsContainer">
+                <!-- Populated by JS - Last 4 news only -->
+            </div>
+
+            <!-- Disclaimer -->
+            <div class="disclaimer">
+                <div class="disclaimer-title">
+                    <span>⚠️</span> Important Disclaimer
+                </div>
+                <div class="disclaimer-text">
+                    At BankaaTips, we believe in smart, sustainable betting. We're not gamblers - we're profit-minded enthusiasts who understand that consistent small wins beat chasing big losses every time. Our predictions are insights, not guarantees. Bet only what you can afford to lose. Sports predictions involve risk and past performance doesn't guarantee future results.
+                </div>
+            </div>
+
+            <!-- Telegram CTA at End of Home -->
+            <a href="https://t.me/bankaabet" class="telegram-cta" target="_blank" style="margin-top: 24px;">
+                <div class="telegram-icon">💬</div>
+                <div class="telegram-content">
+                    <div class="telegram-title">Don't Miss Out!</div>
+                    <div class="telegram-subtitle">Join 10,000+ members on Telegram for daily winning tips</div>
+                </div>
+                <div class="telegram-arrow">›</div>
+            </a>
+
+            <!-- Data Import Section (Hidden by default, for admin data updates) -->
+            <div class="data-import" id="dataImportSection">
+                <div class="data-import-title">📥 Import Data from Admin</div>
+                <textarea id="dataImportInput" placeholder="Paste exported data from admin panel here..."></textarea>
+                <button class="data-import-btn" onclick="importData()">Import Data</button>
+            </div>
+        </section>
+
+        <!-- FREE TIPS SECTION -->
+        <section class="section" id="tipsSection">
+            <div class="section-title">Today's Free Tips</div>
+            <div class="tips-container" id="freeTipsContainer">
+                <!-- Populated by JS -->
+            </div>
+            
+            <!-- Telegram CTA at End of Free Tips -->
+            <a href="https://t.me/bankaabet" class="telegram-cta" target="_blank" style="margin-top: 16px;">
+                <div class="telegram-icon">🎯</div>
+                <div class="telegram-content">
+                    <div class="telegram-title">Get More Tips on Telegram</div>
+                    <div class="telegram-subtitle">Premium predictions & exclusive analysis daily</div>
+                </div>
+                <div class="telegram-arrow">›</div>
+            </a>
+        </section>
+
+        <!-- NEWS SECTION -->
+        <section class="section" id="newsSection">
+            <div class="section-title">All News</div>
+            <div class="news-container" id="allNewsContainer">
+                <!-- Populated by JS - All news -->
+            </div>
+            
+            <!-- Telegram CTA at End of News -->
+            <a href="https://t.me/bankaabet" class="telegram-cta" target="_blank" style="margin-top: 16px;">
+                <div class="telegram-icon">📢</div>
+                <div class="telegram-content">
+                    <div class="telegram-title">Get News First on Telegram</div>
+                    <div class="telegram-subtitle">Breaking news & transfer updates instantly</div>
+                </div>
+                <div class="telegram-arrow">›</div>
+            </a>
+        </section>
+
+        <!-- HISTORY SECTION -->
+        <section class="section" id="historySection">
+            <div class="back-btn" onclick="switchTab('home')">
+                <span>←</span> Back to Home
+            </div>
+            <div class="section-title">Full History & Results</div>
+            <div id="historyContainer">
+                <!-- Populated by JS - All archived history -->
+            </div>
+        </section>
+
+        <!-- PRO SECTION -->
+        <section class="section" id="proSection">
+            <div class="pro-types-header">
+                <div class="pro-types-title">BankaaTips Types</div>
+                <div class="pro-types-desc">
+                    We understand that different people have different risk tolerance levels. That's why at BankaaTips, we've crafted three distinct prediction tiers—each designed to match your unique betting style. Whether you prefer steady, calculated gains or you're driven by the thrill of high-stakes opportunities, our expertly curated tips empower you to bet smarter, not harder. Choose your path to consistent profitability.
+                </div>
+            </div>
+
+            <div class="pro-packages">
+                <!-- Single Bankaa -->
+                <div class="pro-card">
+                    <div class="pro-badge">POPULAR</div>
+                    <div class="pro-title">Single Bankaa</div>
+                    <div class="pro-subtitle">Our highest confidence single prediction of the day. Perfect for steady, reliable returns with minimal risk exposure.</div>
+                    
+                    <div class="pro-stats" id="singleStats">
+                        <div class="stat-box">
+                            <div class="stat-value" style="color: var(--success);">WON</div>
+                            <div class="stat-label">Yesterday</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value">5-2</div>
+                            <div class="stat-label">Last Week</div>
+                        </div>
+                    </div>
+
+                    <div class="pro-results">
+                        <div class="pro-results-title">Last 7 Days Results</div>
+                        <div class="results-scroll" id="singleBankaaResults">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <a href="https://t.me/bankaabet" class="pro-btn" target="_blank">Get Single Bankaa on Telegram</a>
+                </div>
+
+                <!-- Profit Bankaa -->
+                <div class="pro-card">
+                    <div class="pro-badge" style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white;">BEST VALUE</div>
+                    <div class="pro-title">Profit Bankaa</div>
+                    <div class="pro-subtitle">Designed for consistent daily profit growth through strategic staking. Engineered for disciplined bettors seeking sustainable wealth accumulation.</div>
+                    
+                    <div class="pro-stats" id="profitStats">
+                        <div class="stat-box">
+                            <div class="stat-value" style="color: var(--warning);">45%</div>
+                            <div class="stat-label">Yesterday ROI</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value">115%</div>
+                            <div class="stat-label">Last Week ROI</div>
+                        </div>
+                    </div>
+
+                    <div class="pro-results">
+                        <div class="pro-results-title">Last 7 Days ROI</div>
+                        <div class="results-scroll" id="profitBankaaResults">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <a href="https://t.me/bankaabet" class="pro-btn" target="_blank">Get Profit Bankaa on Telegram</a>
+                </div>
+
+                <!-- ACCA Bankaa -->
+                <div class="pro-card">
+                    <div class="pro-badge" style="background: linear-gradient(135deg, #ef4444, #dc2626); color: white;">HIGH RISK</div>
+                    <div class="pro-title">ACCA Bankaa</div>
+                    <div class="pro-subtitle">Daily 2+ odds predictions for the high-risk, high-reward lovers. Perfect for those looking for big wins and exponential returns.</div>
+                    
+                    <div class="pro-stats" id="accaStats">
+                        <div class="stat-box">
+                            <div class="stat-value" style="color: var(--primary);">265</div>
+                            <div class="stat-label">Total Odds Won Last Month</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" style="color: var(--warning);">2.5x</div>
+                            <div class="stat-label">Avg. Daily Odds</div>
+                        </div>
+                    </div>
+
+                    <div class="pro-results">
+                        <div class="pro-results-title">Last 7 Days Results</div>
+                        <div class="results-scroll" id="accaBankaaResults">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <a href="https://t.me/bankaabet" class="pro-btn" target="_blank">Get ACCA Bankaa on Telegram</a>
+                </div>
+            </div>
+            
+            <!-- Telegram CTA at End of Pro -->
+            <a href="https://t.me/bankaabet" class="telegram-cta" target="_blank" style="margin: 0 20px;">
+                <div class="telegram-icon">👑</div>
+                <div class="telegram-content">
+                    <div class="telegram-title">Unlock All Pro Tips</div>
+                    <div class="telegram-subtitle">Join our VIP Telegram for exclusive high-confidence predictions</div>
+                </div>
+                <div class="telegram-arrow">›</div>
+            </a>
+        </section>
+
+        <!-- ACCOUNT SECTION -->
+        <section class="section" id="accountSection">
+            <div class="account-section">
+                <div class="account-card">
+                    <div class="account-avatar">👤</div>
+                    <div class="account-name">Guest User</div>
+                    <div class="account-type">Free Member</div>
+                </div>
+
+                <div class="settings-list">
+                    <div class="setting-item">
+                        <div class="setting-left">
+                            <div class="setting-icon">🌙</div>
+                            <div class="setting-text">Dark Mode</div>
+                        </div>
+                        <div class="setting-right">
+                            <div class="toggle-switch active" id="themeToggle" onclick="toggleTheme()"></div>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-left">
+                            <div class="setting-icon">🔔</div>
+                            <div class="setting-text">Notifications</div>
+                        </div>
+                        <div class="setting-right">
+                            <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-left">
+                            <div class="setting-icon">🌍</div>
+                            <div class="setting-text">Language</div>
+                        </div>
+                        <div class="setting-right">
+                            <span style="color: var(--text-secondary); font-size: 14px;">English</span>
+                            <span style="color: var(--text-secondary);">›</span>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-left">
+                            <div class="setting-icon">❓</div>
+                            <div class="setting-text">Help & Support</div>
+                        </div>
+                        <div class="setting-right">
+                            <span style="color: var(--text-secondary);">›</span>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-left">
+                            <div class="setting-icon">📋</div>
+                            <div class="setting-text">Terms of Service</div>
+                        </div>
+                        <div class="setting-right">
+                            <span style="color: var(--text-secondary);">›</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Telegram CTA in Account -->
+                <a href="https://t.me/bankaabet" class="telegram-cta" target="_blank" style="margin-top: 24px;">
+                    <div class="telegram-icon">🚀</div>
+                    <div class="telegram-content">
+                        <div class="telegram-title">Join Our Community</div>
+                        <div class="telegram-subtitle">Connect with 10,000+ betting enthusiasts</div>
+                    </div>
+                    <div class="telegram-arrow">›</div>
+                </a>
+
+                <div style="margin-top: 24px; text-align: center;">
+                    <p style="font-size: 12px; color: var(--text-secondary);">BankaaTips v1.0.0</p>
+                    <p style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">© 2025 BankaaTips. All rights reserved.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="switchTab('home')">
+            <span class="nav-icon">🏠</span>
+            <span class="nav-label">Home</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('tips')">
+            <span class="nav-icon">⚽</span>
+            <span class="nav-label">Tips</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('history')">
+            <span class="nav-icon">📊</span>
+            <span class="nav-label">History</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('pro')">
+            <span class="nav-icon">👑</span>
+            <span class="nav-label">Pro</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('account')">
+            <span class="nav-icon">👤</span>
+            <span class="nav-label">Account</span>
+        </button>
+    </nav>
+
+    <script>
+        // ==================== DATA STORAGE ====================
+        
+        // Default data - will be overwritten if imported from admin
+        let siteData = {
+            logoSettings: {
+                type: 'emoji',
+                value: 'B'
+            },
+            tickerSettings: {
+                show: true,
+                text: '🔥 Welcome to BankaaTips! Check out our latest winning predictions and join our Telegram for exclusive tips!'
+            },
+            bannerData: [
+                {
+                    id: 1,
+                    image: '',
+                    title: '🔥 Hot Streak!',
+                    subtitle: 'Yesterday: 4 Wins, 1 Loss | 80% Success Rate',
+                    gradient: 'linear-gradient(135deg, #1a1a2e, #16213e)'
+                },
+                {
+                    id: 2,
+                    image: '',
+                    title: 'Join Our Telegram',
+                    subtitle: 'Get exclusive tips and instant updates',
+                    gradient: 'linear-gradient(135deg, #16C784, #12a56d)'
+                },
+                {
+                    id: 3,
+                    image: '',
+                    title: 'Pro Tips Available',
+                    subtitle: 'Upgrade for high-confidence predictions',
+                    gradient: 'linear-gradient(135deg, #f59e0b, #d97706)'
+                }
+            ],
+            freeTips: [
+                {
+                    id: 1,
+                    league: "Premier League",
+                    homeTeam: "Arsenal",
+                    awayTeam: "Chelsea",
+                    prediction: "Over 2.5",
+                    odds: "1.85",
+                    confidence: 78,
+                    time: "15:00",
+                    homeEmoji: "🔴",
+                    awayEmoji: "🔵"
+                },
+                {
+                    id: 2,
+                    league: "La Liga",
+                    homeTeam: "Real Madrid",
+                    awayTeam: "Barcelona",
+                    prediction: "BTTS Yes",
+                    odds: "1.72",
+                    confidence: 82,
+                    time: "20:00",
+                    homeEmoji: "⚪",
+                    awayEmoji: "🔵"
+                },
+                {
+                    id: 3,
+                    league: "Serie A",
+                    homeTeam: "Juventus",
+                    awayTeam: "AC Milan",
+                    prediction: "Home Win",
+                    odds: "2.10",
+                    confidence: 65,
+                    time: "18:30",
+                    homeEmoji: "⚫",
+                    awayEmoji: "🔴"
+                },
+                {
+                    id: 4,
+                    league: "Bundesliga",
+                    homeTeam: "Bayern Munich",
+                    awayTeam: "Dortmund",
+                    prediction: "Over 3.5",
+                    odds: "1.95",
+                    confidence: 71,
+                    time: "17:30",
+                    homeEmoji: "🔴",
+                    awayEmoji: "🟡"
+                },
+                {
+                    id: 5,
+                    league: "Champions League",
+                    homeTeam: "Man City",
+                    awayTeam: "PSG",
+                    prediction: "Over 2.5",
+                    odds: "1.80",
+                    confidence: 75,
+                    time: "21:00",
+                    homeEmoji: "🔵",
+                    awayEmoji: "🔵"
+                }
+            ],
+            newsData: [
+                {
+                    id: 1,
+                    category: "Transfer",
+                    title: "Haaland Linked with Record-Breaking Move",
+                    preview: "Manchester City striker could be on his way to Spain in a deal worth over €150m...",
+                    time: "2 hours ago",
+                    image: "⚽"
+                },
+                {
+                    id: 2,
+                    category: "Injury",
+                    title: "Salah Doubtful for Weekend Clash",
+                    preview: "Liverpool's star winger picked up a knock in training and faces a late fitness test...",
+                    time: "4 hours ago",
+                    image: "🏥"
+                },
+                {
+                    id: 3,
+                    category: "Analysis",
+                    title: "Premier League: Top 4 Race Heats Up",
+                    preview: "With just 10 games remaining, we analyze the chances of each contender...",
+                    time: "6 hours ago",
+                    image: "📊"
+                },
+                {
+                    id: 4,
+                    category: "Match Preview",
+                    title: "Champions League Quarter-Finals Set",
+                    preview: "The draw has been made and we look at the key matchups to watch...",
+                    time: "8 hours ago",
+                    image: "🏆"
+                },
+                {
+                    id: 5,
+                    category: "Transfer",
+                    title: "Mbappe to Real Madrid Confirmed",
+                    preview: "The long-awaited transfer has finally been announced by both clubs...",
+                    time: "12 hours ago",
+                    image: "✍️"
+                }
+            ],
+            historyData: [],
+            proResults: {
+                single: {
+                    yesterday: "WON",
+                    lastWeek: "5 Won, 2 Lost",
+                    pastResults: [
+                        { date: "Feb 16", result: "won", display: "WON" },
+                        { date: "Feb 15", result: "won", display: "WON" },
+                        { date: "Feb 14", result: "lost", display: "LOST" },
+                        { date: "Feb 13", result: "won", display: "WON" },
+                        { date: "Feb 12", result: "won", display: "WON" },
+                        { date: "Feb 11", result: "lost", display: "LOST" },
+                        { date: "Feb 10", result: "won", display: "WON" }
+                    ]
+                },
+                profit: {
+                    yesterday: "45%",
+                    lastWeek: "115%",
+                    pastResults: [
+                        { date: "Feb 16", roi: "52%" },
+                        { date: "Feb 15", roi: "38%" },
+                        { date: "Feb 14", roi: "-12%" },
+                        { date: "Feb 13", roi: "45%" },
+                        { date: "Feb 12", roi: "28%" },
+                        { date: "Feb 11", roi: "15%" },
+                        { date: "Feb 10", roi: "41%" }
+                    ]
+                },
+                acca: {
+                    totalOddsLastMonth: "265",
+                    pastResults: [
+                        { date: "Feb 16", odds: "52", status: "won" },
+                        { date: "Feb 15", odds: "38", status: "lost" },
+                        { date: "Feb 14", odds: "45", status: "won" },
+                        { date: "Feb 13", odds: "28", status: "lost" },
+                        { date: "Feb 12", odds: "62", status: "won" },
+                        { date: "Feb 11", odds: "35", status: "lost" },
+                        { date: "Feb 10", odds: "41", status: "won" }
+                    ]
+                }
+            }
+        };
+
+        let currentSlide = 0;
+
+        // ==================== INITIALIZATION ====================
+
+        function initHistoryData() {
+            const today = new Date();
+            const matches = [
+                { match: "Arsenal vs Chelsea", prediction: "Over 2.5" },
+                { match: "Man United vs Liverpool", prediction: "BTTS Yes" },
+                { match: "Real Madrid vs Atletico", prediction: "Home Win" },
+                { match: "Bayern vs Leipzig", prediction: "Over 2.5" },
+                { match: "Juventus vs Inter", prediction: "Under 2.5" },
+                { match: "PSG vs Marseille", prediction: "Home Win" },
+                { match: "Barcelona vs Sevilla", prediction: "Over 3.5" }
+            ];
+            
+            for (let i = 1; i <= 7; i++) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+                const displayDate = date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+                
+                const dayResults = [];
+                const numMatches = Math.floor(Math.random() * 3) + 3;
+                
+                for (let j = 0; j < numMatches; j++) {
+                    const matchTemplate = matches[Math.floor(Math.random() * matches.length)];
+                    const won = Math.random() > 0.35;
+                    const homeScore = Math.floor(Math.random() * 4);
+                    const awayScore = Math.floor(Math.random() * 3);
+                    
+                    dayResults.push({
+                        id: `archived-${i}-${j}`,
+                        match: matchTemplate.match,
+                        prediction: matchTemplate.prediction,
+                        score: `${homeScore}-${awayScore}`,
+                        result: won ? 'won' : 'lost',
+                        date: dateStr
+                    });
+                }
+                
+                siteData.historyData.push({
+                    date: dateStr,
+                    displayDate: displayDate,
+                    results: dayResults
+                });
+            }
+        }
+
+        // ==================== DATA IMPORT FROM ADMIN ====================
+
+        function importData() {
+            const input = document.getElementById('dataImportInput').value.trim();
+            if (!input) {
+                alert('Please paste data from admin panel');
+                return;
+            }
+
+            try {
+                const importedData = JSON.parse(atob(input));
+                
+                // Merge imported data
+                if (importedData.logoSettings) siteData.logoSettings = importedData.logoSettings;
+                if (importedData.tickerSettings) siteData.tickerSettings = importedData.tickerSettings;
+                if (importedData.bannerData) siteData.bannerData = importedData.bannerData;
+                if (importedData.freeTips) siteData.freeTips = importedData.freeTips;
+                if (importedData.newsData) siteData.newsData = importedData.newsData;
+                if (importedData.historyData) siteData.historyData = importedData.historyData;
+                if (importedData.proResults) siteData.proResults = importedData.proResults;
+
+                // Save to localStorage for persistence
+                localStorage.setItem('bankaaTipsData', JSON.stringify(siteData));
+
+                // Re-render everything
+                renderAll();
+                
+                alert('Data imported successfully! ✅');
+                document.getElementById('dataImportSection').classList.remove('show');
+                document.getElementById('dataImportInput').value = '';
+            } catch (e) {
+                alert('Invalid data format. Please copy the exact export code from admin panel.');
+            }
+        }
+
+        function checkForStoredData() {
+            const stored = localStorage.getItem('bankaaTipsData');
+            if (stored) {
+                try {
+                    siteData = JSON.parse(stored);
+                } catch (e) {
+                    console.error('Failed to load stored data');
+                }
+            }
+        }
+
+        // ==================== BANNER CAROUSEL ====================
+
+        function initCarousel() {
+            setInterval(() => {
+                currentSlide = (currentSlide + 1) % siteData.bannerData.length;
+                updateCarousel();
+            }, 5000);
+        }
+
+        function updateCarousel() {
+            const slides = document.querySelectorAll('.banner-slide');
+            const dots = document.querySelectorAll('.banner-dot');
+            
+            slides.forEach((slide, idx) => {
+                slide.classList.toggle('active', idx === currentSlide);
+            });
+            
+            dots.forEach((dot, idx) => {
+                dot.classList.toggle('active', idx === currentSlide);
+            });
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            updateCarousel();
+        }
+
+        // ==================== RENDER FUNCTIONS ====================
+
+        function renderLogo() {
+            const logoIcon = document.getElementById('logoIcon');
+            if (siteData.logoSettings.type === 'image' && siteData.logoSettings.value.startsWith('http')) {
+                logoIcon.innerHTML = `<img src="${siteData.logoSettings.value}" alt="Logo">`;
+            } else {
+                logoIcon.textContent = siteData.logoSettings.value || 'B';
+            }
+        }
+
+        function renderTicker() {
+            const ticker = document.getElementById('alertTicker');
+            const tickerText = document.getElementById('tickerText');
+            
+            if (siteData.tickerSettings.show) {
+                ticker.classList.add('show');
+                tickerText.textContent = siteData.tickerSettings.text;
+            } else {
+                ticker.classList.remove('show');
+            }
+        }
+
+        function renderBanner() {
+            const carousel = document.getElementById('bannerCarousel');
+            let html = '';
+            
+            siteData.bannerData.forEach((banner, idx) => {
+                const bgStyle = banner.image ? 
+                    `background-image: url('${banner.image}');` : 
+                    `background: ${banner.gradient};`;
+                
+                html += `
+                    <div class="banner-slide ${idx === 0 ? 'active' : ''}" style="${bgStyle}">
+                        <div class="banner-content">
+                            <div class="banner-title">${banner.title}</div>
+                            <div class="banner-subtitle">${banner.subtitle}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '<div class="banner-dots">';
+            siteData.bannerData.forEach((_, idx) => {
+                html += `<div class="banner-dot ${idx === 0 ? 'active' : ''}" onclick="goToSlide(${idx})"></div>`;
+            });
+            html += '</div>';
+            
+            carousel.innerHTML = html;
+        }
+
+        function renderFreeTips() {
+            const container = document.getElementById('freeTipsContainer');
+            if (siteData.freeTips.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">⚽</div>
+                        <div class="empty-title">No Tips Available</div>
+                        <div class="empty-text">Check back later for today's predictions!</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = siteData.freeTips.map(tip => `
+                <div class="tip-card">
+                    <div class="tip-header">
+                        <div class="league-badge">
+                            <div class="league-icon">⚽</div>
+                            <span>${tip.league}</span>
+                        </div>
+                        <div class="match-time">Today, ${tip.time}</div>
+                    </div>
+                    <div class="match-teams">
+                        <div class="team">
+                            <div class="team-logo">${tip.homeEmoji}</div>
+                            <div class="team-name">${tip.homeTeam}</div>
+                        </div>
+                        <div class="vs">VS</div>
+                        <div class="team" style="flex-direction: row-reverse;">
+                            <div class="team-logo">${tip.awayEmoji}</div>
+                            <div class="team-name">${tip.awayTeam}</div>
+                        </div>
+                    </div>
+                    <div class="prediction-row">
+                        <div class="prediction-box">
+                            <div class="prediction-label">Prediction</div>
+                            <div class="prediction-value">${tip.prediction}</div>
+                        </div>
+                        <div class="prediction-box">
+                            <div class="prediction-label">Odds</div>
+                            <div class="prediction-value">${tip.odds}</div>
+                        </div>
+                        <div class="prediction-box">
+                            <div class="prediction-label">Confidence</div>
+                            <div class="prediction-value">${tip.confidence}%</div>
+                            <div class="confidence-bar">
+                                <div class="confidence-fill" style="width: ${tip.confidence}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderNewsCard(news, isHome = false) {
+            const isImageUrl = news.image && news.image.startsWith('http');
+            const imageContent = isImageUrl ? 
+                `<img src="${news.image}" alt="${news.title}">` : 
+                `<span class="news-image-placeholder">${news.image || '📰'}</span>`;
+            
+            return `
+                <div class="news-card" onclick="switchTab('news')">
+                    <div class="news-image">
+                        ${imageContent}
+                    </div>
+                    <div class="news-content">
+                        <div class="news-meta">
+                            <span class="news-category">${news.category}</span>
+                            <span class="news-time">${news.time}</span>
+                        </div>
+                        <div class="news-title">${news.title}</div>
+                        <div class="news-preview">${news.preview}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderHomeNews() {
+            const container = document.getElementById('homeNewsContainer');
+            const last4News = siteData.newsData.slice(0, 4);
+            container.innerHTML = last4News.map(news => renderNewsCard(news, true)).join('');
+        }
+
+        function renderAllNews() {
+            const container = document.getElementById('allNewsContainer');
+            container.innerHTML = siteData.newsData.map(news => renderNewsCard(news)).join('');
+        }
+
+        function renderYesterdayResults() {
+            const container = document.getElementById('yesterdayResults');
+            
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayStr = yesterday.toISOString().split('T')[0];
+            
+            const yesterdayData = siteData.historyData.find(h => h.date === yesterdayStr);
+            
+            if (!yesterdayData || yesterdayData.results.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <div class="empty-title">No Results Yet</div>
+                        <div class="empty-text">Yesterday's results will appear here once matches conclude.</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = yesterdayData.results.map(result => `
+                <div class="result-card">
+                    <div class="result-header">
+                        <div class="result-date">Yesterday</div>
+                        <div class="result-badge ${result.result}">${result.result === 'pending' ? 'PENDING' : result.result.toUpperCase()}</div>
+                    </div>
+                    <div class="result-teams">
+                        <div class="team">
+                            <div class="team-logo">⚽</div>
+                            <div class="team-name">${result.match}</div>
+                        </div>
+                        <div class="result-score">${result.score || '-:-'}</div>
+                    </div>
+                    <div class="result-prediction">Prediction: ${result.prediction}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('historyContainer');
+            
+            if (siteData.historyData.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📊</div>
+                        <div class="empty-title">No History Yet</div>
+                        <div class="empty-text">Past predictions will appear here once archived.</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = siteData.historyData.map(day => `
+                <div class="date-group">
+                    <div class="date-header">${day.displayDate}</div>
+                    <div class="tips-container">
+                        ${day.results.map(result => `
+                            <div class="result-card">
+                                <div class="result-header">
+                                    <div class="result-date">${day.displayDate}</div>
+                                    <div class="result-badge ${result.result}">${result.result === 'pending' ? 'PENDING' : result.result.toUpperCase()}</div>
+                                </div>
+                                <div class="result-teams">
+                                    <div class="team">
+                                        <div class="team-logo">⚽</div>
+                                        <div class="team-name">${result.match}</div>
+                                    </div>
+                                    <div class="result-score">${result.score || '-:-'}</div>
+                                </div>
+                                <div class="result-prediction">Prediction: ${result.prediction}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderProResults() {
+            // Single Bankaa
+            document.getElementById('singleStats').innerHTML = `
+                <div class="stat-box">
+                    <div class="stat-value" style="color: var(--success);">${siteData.proResults.single.yesterday}</div>
+                    <div class="stat-label">Yesterday</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">${siteData.proResults.single.lastWeek}</div>
+                    <div class="stat-label">Last Week</div>
+                </div>
+            `;
+            
+            const singleContainer = document.getElementById('singleBankaaResults');
+            singleContainer.innerHTML = siteData.proResults.single.pastResults.map(r => `
+                <div class="mini-result">
+                    <div class="mini-result-date">${r.date}</div>
+                    <div class="mini-result-icon">${r.result === 'won' ? '✅' : '❌'}</div>
+                    <div class="mini-result-value">${r.display}</div>
+                </div>
+            `).join('');
+
+            // Profit Bankaa
+            document.getElementById('profitStats').innerHTML = `
+                <div class="stat-box">
+                    <div class="stat-value" style="color: var(--warning);">${siteData.proResults.profit.yesterday}</div>
+                    <div class="stat-label">Yesterday ROI</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">${siteData.proResults.profit.lastWeek}</div>
+                    <div class="stat-label">Last Week ROI</div>
+                </div>
+            `;
+            
+            const profitContainer = document.getElementById('profitBankaaResults');
+            profitContainer.innerHTML = siteData.proResults.profit.pastResults.map(r => `
+                <div class="mini-result">
+                    <div class="mini-result-date">${r.date}</div>
+                    <div class="mini-result-icon" style="color: var(--primary);">📈</div>
+                    <div class="mini-result-value">${r.roi}</div>
+                </div>
+            `).join('');
+
+            // ACCA Bankaa
+            document.getElementById('accaStats').innerHTML = `
+                <div class="stat-box">
+                    <div class="stat-value" style="color: var(--primary);">${siteData.proResults.acca.totalOddsLastMonth}</div>
+                    <div class="stat-label">Total Odds Won Last Month</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" style="color: var(--warning);">2.5x</div>
+                    <div class="stat-label">Avg. Daily Odds</div>
+                </div>
+            `;
+            
+            const accaContainer = document.getElementById('accaBankaaResults');
+            accaContainer.innerHTML = siteData.proResults.acca.pastResults.map(r => `
+                <div class="mini-result">
+                    <div class="mini-result-date">${r.date}</div>
+                    <div class="mini-result-icon">${r.status === 'won' ? '✅' : '❌'}</div>
+                    <div class="mini-result-value">${r.odds} odds</div>
+                    <div class="mini-result-status">${r.status.toUpperCase()}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderAll() {
+            renderLogo();
+            renderTicker();
+            renderBanner();
+            renderFreeTips();
+            renderHomeNews();
+            renderAllNews();
+            renderYesterdayResults();
+            renderHistory();
+            renderProResults();
+        }
+
+        // ==================== NAVIGATION & THEME ====================
+
+        function switchTab(tab) {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            if (event && event.currentTarget) {
+                event.currentTarget.classList.add('active');
+            } else {
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    if (item.getAttribute('onclick') && item.getAttribute('onclick').includes(`'${tab}'`)) {
+                        item.classList.add('active');
+                    }
+                });
+            }
+
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(tab + 'Section').classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const toggle = document.getElementById('themeToggle');
+            const currentTheme = body.getAttribute('data-theme');
+            
+            if (currentTheme === 'light') {
+                body.setAttribute('data-theme', 'dark');
+                toggle.classList.add('active');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                body.setAttribute('data-theme', 'light');
+                toggle.classList.remove('active');
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            const toggle = document.getElementById('themeToggle');
+            
+            if (savedTheme === 'light') {
+                document.body.setAttribute('data-theme', 'light');
+                toggle.classList.remove('active');
+            } else {
+                document.body.setAttribute('data-theme', 'dark');
+                toggle.classList.add('active');
+            }
+        }
+
+        // ==================== INITIALIZATION ====================
+
+        document.addEventListener('DOMContentLoaded', function() {
+            checkForStoredData();
+            initHistoryData();
+            loadTheme();
+            renderAll();
+            initCarousel();
+            
+            // Check for URL parameter to show data import
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('admin')) {
+                document.getElementById('dataImportSection').classList.add('show');
+            }
+        });
+    </script>
+</body>
+</html>
